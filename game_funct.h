@@ -31,17 +31,17 @@ typedef struct player{
 }
   player;
 
+void shuffle(int *roles);
 void assign_roles(player* player_list);
-int lynch_count(player* player_list);
-int num_alive(player* player_list);
-void shuffle(player* player_list);
-int night_action(player* player_list);
 int doctor_action(player* player_list);
 int mafia_action(player* player_list);
 int cop_action(player* player_list);
-int player_index(char* name, player* player_list);
+int night_action(player* player_list);
+char* get_role(int role);
 void print_DEAD(player* player_list);
 void print_ALIVE(player* player_list);
-char* get_role(int role);
+int num_alive(player* player_list);
+int lynch_count(player* player_list);
+int process_cmd(char *line, player p, player *player_list, int cycle);
 
 #endif

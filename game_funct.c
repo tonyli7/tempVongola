@@ -24,18 +24,6 @@ void assign_roles(player* player_list){
   }
 }
 
-int player_index(char* name, player* player_list){//find index of player
-  int i; 
-  for(i = 0; i < MAX_PLAYERS; i++){   
-    if (!strcmp(player_list[i].name,name)){
-      if (player_list[i].status == ALIVE){
-	return i;
-      }
-    }
-  } 
-  return -1;
-}
-
 int doctor_action(player* player_list){
   int i;
   for(i = 0; i < MAX_PLAYERS; i++){
@@ -165,19 +153,19 @@ int lynch_count(player* player_list ){
   return -1;
 }
 
-int process_cmd(char* line,player p, player* player_list, int cycle){
+int process_cmd(char *line, player p, player *player_list, int cycle){
   line  = trim(line);
-  if(count_tokens(line)==1){
-    if(strstr(line,"/p")==line){//print out player list
+  if(count_tokens(line) == 1){
+    if(strstr(line,"/p") == line){//print out player list
       return 1;
     }
     return 0;
   }
-  else if(count_tokens(line)==2){
+  else if(count_tokens(line) == 2){
     char **ps = (char**)parse_by_space(line);
-    if(strstr(ps[0],"/v")==line){
+    if(strstr(ps[0],"/v") == line){
       player target=player_list[atoi(ps[1])];
-	if(cycle%2==0){//if night
+	if(cycle%2 == 0){//if night
 	  if(target.role == MAFIASO && p.role == MAFIASO){
 	    return 0;
 	  }
