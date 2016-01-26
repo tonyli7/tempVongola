@@ -123,6 +123,7 @@ void print_alive(player* player_list){
     if (player_list[i].status == ALIVE){
       printf("Name: %s ", player_list[i].name);      
       printf("Role: %s\n", get_role(player_list[i].role));
+      printf("Votes: %d\n", player_list[i].vote);
     }
   }
 }
