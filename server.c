@@ -110,8 +110,8 @@ void accept_client(int *socket_id, fd_set *master, int *fdmax){
 int main() {
   int socket_id, i;
   fd_set master, read_fds;
-  int day = 0;
-  int hold = day;//helps to check if day has changed
+  int cycle = 0;
+  int hold = cycle;//helps to check if cycle has changed
   int num_players = 0;
   time_t start,diff;
   struct timeval timeout;
@@ -128,74 +128,45 @@ int main() {
   FD_SET(socket_id, &master);
   int fdmax = socket_id;
   while(1){
-    //printf("Time:%d\n",time(NULL));
     read_fds = master;
-    if(num_players<2){
-      num_players=0;
+    if(num_players < 2){
+      num_players = 0;
       for(i = 0; i < 15; i++)
 	if(strlen(ulist[i])>0)
 	  num_players++;
     }
-    //printf("Players:%d\n",num_players);
-    if (num_players>=2&&day==0){//once num_players has reached a number, game begins
-      //printf("HERE!\n");
-      day = 1;
+    if (num_players >= 2 && cycle == 0){//once num_players has reached a number, game begins
+      cycle = 1;
     }
-    if(day>=1){
-      if (hold!=day){
-	//printf("here2\n");
+    if(cycle >= 1){
+      if (hold!=cycle){
 	start = time(NULL);
 	char d[20];
-	if(day%2==1)
-	  sprintf(d,"Start of Day %d\n",day/2+1);
+	if(cycle %2 == 1)
+	  sprintf(d,"Start of Day %d\n", cycle/2+1);
 	else
-	  sprintf(d,"Start of Night %d\n",day/2);
-	send_to_all(d,0,&master,fdmax,socket_id);
-	hold=day;
+	  sprintf(d,"Start of Night %d\n", cycle/2);
+	send_to_all(d, 0, &master, fdmax, socket_id);
+	hold = cycle;
       }
       else{
-	//printf("here!\n");
 	diff = time(NULL) - start;
-	//printf("%d\n",diff);
 	if(diff>=10){
-	  printf("10 sec\n");
-	  day++;
+	  cycle++;
 	}
       }
     }
-    //printf("here3\n");
     if (select(fdmax+1, &read_fds, NULL, NULL, &timeout) == -1){
       printf("select: %s\n", strerror(errno));
       exit(0);
     }
-    //fflush(stdout);
-    /*if(hold!=day){
-      //printf("Here4\n");
-      char d[20];
-      if(day%2==1)
-	sprintf(d,"Start of Day %d\n",day/2+1);
-      else
-	sprintf(d,"Start of Night %d\n",day/2);
-      send_to_all(d,0,&master,fdmax,socket_id);
-    }*/
     for(i = 3; i <= fdmax; i++){
-      //printf("Here2 %d,%d\n",hold,day);
       if(FD_ISSET(i, &read_fds)){
 	if(i == socket_id){//if a client is trying to connect
-	  //printf("Here3\n");
-	    accept_client(&socket_id, &master, &fdmax);
+	  accept_client(&socket_id, &master, &fdmax);
 	}else{
 	  process(i, &master, fdmax, socket_id, ulist);
 	}
-	/*if(hold!=day){
-	  printf("Here4\n");
-	  char d[20];
-	  if(day%2==1)
-	    sprintf(d,"Start of Day %d",day/2+1);
-	  else
-	    sprintf(d,"Start of Night %d",day/2);
-	    send(i,d,strlen(d),0);
-	    }*/
       }
     }
   }
