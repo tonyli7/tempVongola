@@ -16,7 +16,6 @@ void send_to_all(char *line, int fd, fd_set *master, int fdmax, player *player_l
   if(fd != 0){
     int command = process_cmd(line, player_list[fd-4], player_list, cycle);
     if(command == -1){
-      printf("GOOD\n");
       int x;
       for(x = 0; x < MAX_PLAYERS; x++){
 	if(player_list[x].status == ALIVE){
@@ -27,9 +26,9 @@ void send_to_all(char *line, int fd, fd_set *master, int fdmax, player *player_l
       return;
     }else if(command < MAX_PLAYERS){
       if(cycle%2 == 0){
-	sprintf(line, "%s has voted to kill %s\n", player_list[fd-4].name, player_list[player_list[fd-4].mark].name);
+	sprintf(line, "%s has voted to kill %s\n", player_list[fd-4].name, player_list[command].name);
       }else{
-	sprintf(line,"%s has voted to lynch %s\n", player_list[fd-4].name, player_list[player_list[fd-4].mark].name);
+	sprintf(line,"%s has voted to lynch %s\n", player_list[fd-4].name, player_list[command].name);
       }
     }
   }
