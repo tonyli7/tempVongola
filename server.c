@@ -17,9 +17,10 @@ void send_to_all(char *line, int fd, fd_set *master, int fdmax, player *player_l
     int command = process_cmd(line, player_list[fd-4], player_list, cycle);
     if(command == -1){
       int x;
+      strcpy(line,"");
       for(x = 0; x < MAX_PLAYERS; x++){
 	if(player_list[x].status == ALIVE){
-	  sprintf(line, "%d %s\n", x, player_list[x].name);
+	  sprintf(line+strlen(line), "%d %s\n", x, player_list[x].name);
 	}
       }
       send(fd, line, strlen(line), 0);
