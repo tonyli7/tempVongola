@@ -1,4 +1,3 @@
-
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
@@ -6,6 +5,7 @@
 
 void shuffle(int *roles){
   int i;
+  srand(time(NULL));
   for(i = 0;i < MAX_PLAYERS; i++){
     int lucky = rand()%(MAX_PLAYERS-i) + i;
     int temp = roles[i];
@@ -23,6 +23,9 @@ void assign_roles(player* player_list){
 
   roles[0]=1;
   roles[1]=1;
+
+  shuffle(roles);
+
   for(i = 0; i < MAX_PLAYERS; i++){
     player_list[i].role=roles[i];
   }
