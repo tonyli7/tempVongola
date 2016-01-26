@@ -19,9 +19,11 @@ void send_to_all(char *line, int fd, fd_set *master, int fdmax, player *player_l
       int x;
       strcpy(line,"");
       for(x = 0; x < MAX_PLAYERS; x++){
-	if(player_list[x].status == ALIVE){
-	  sprintf(line+strlen(line), "%d %s\n", x, player_list[x].name);
-	}
+	sprintf(line+strlen(line), "mark:%d id: %d Name: %s Status:",player_list[x].mark, x, player_list[x].name);
+	if(player_list[x].status==ALIVE)
+	  sprintf(line+strlen(line), "ALIVE Votes: %d\n",player_list[x].vote);
+	else
+	  sprintf(line+strlen(line), "DEAD\n");
       }
       send(fd, line, strlen(line), 0);
       return;
@@ -171,11 +173,11 @@ int main(){
 	char d[20];
 	char deaths[256]="Deaths\n";
 	if(cycle > 1){
-	  process_votes(player_list, cycle);
+	  process_votes(player_list, cycle-1);
 	  for(i = 0; i < MAX_PLAYERS; i++){
 	    if(player_list[i].status == JUST_DEAD){
 	      char *p = (char *)malloc(sizeof(char));
-	      if(cycle%2 == 1)
+	      if(cycle%2 == 0)
 		sprintf(p,"%s died by lynch\n",player_list[i].name);
 	      else
 		sprintf(p,"%s died by Mafia\n",player_list[i].name);
@@ -183,6 +185,7 @@ int main(){
 	      player_list[i].status=DEAD;
 	    }
 	  }
+	  send_to_all(deaths, 0, &master, fdmax, player_list,1);
 	}
 	if(cycle %2 == 1){
 	  sprintf(d, "Start of Day %d\n", cycle/2+1);
@@ -192,7 +195,7 @@ int main(){
 	send_to_all(d, 0, &master, fdmax, player_list, 1);
 	for(i = 0; i < MAX_PLAYERS; i++){
 	  player_list[i].vote=0;
-	  player_list[i].mark=MAX_PLAYERS;
+	  player_list[i].mark=-1;
 	}
 	hold = cycle;
       }
