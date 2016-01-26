@@ -49,7 +49,6 @@ void process(int fd, fd_set *master, int fdmax, int socket_id, player *player_li
   }else{
     sprintf(line, "%s: %s", player_list[fd-4].name, buffer);
   }
-  printf("%s\n", line);
   if(strlen(line) > 0){
     send_to_all(line, fd, master, fdmax, socket_id);
   }

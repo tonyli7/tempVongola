@@ -3,69 +3,30 @@
 #include <string.h>
 #include "game_funct.h"
 
-void shuffle(player* player_list){
-  // srand(time(NULL));
-  int size=sizeof(player_list);
- 
-  int interval=0;
-
-  while (interval<size){
-    int lucky=rand()%(size-interval)+interval;
-    player temp;
-    temp=player_list[interval];
-    player_list[interval]=player_list[lucky];
-    player_list[lucky]=temp;
-    interval++;
-    
-  }
-}
-
 void assign_roles(player* player_list){
-  /*----------NOTE----------
-   This assumes there is always: 1 cop, 1 doc, 2 maf*/
-  int size=sizeof(player_list);
-  
-  shuffle(player_list);
- 
-  int* roles=malloc(8);
-  
-  roles[0]=1;
-  //roles[1]=1;
-  //roles[2]=1;
-  //roles[3]=1;
- 
-  int i=1;
+  int roles[MAX_PLAYERS];
 
-  while (i < size){
+  int i;
+
+  for(i = 0;  i < MAX_PLAYERS; i++){
     roles[i]=0;
-    i++;
   }
 
-  i=0;
- 
-  while (i < size){
+  for(i = 0; i < MAX_PLAYERS; i++){
     player_list[i].role=roles[i];
-    i++;
   }
-
 }
 
 int player_index(char* name, player* player_list){//find index of player
-  int size=sizeof(player_list);
-  int i=0;
+  int i;
  
-  while (i<size){
-   
-    if (!strcmp(player_list[i].name,name)){
-      
+  for(i = 0; i < MAX_PLAYERS; i++){   
+    if (!strcmp(player_list[i].name,name)){      
       if (player_list[i].status == ALIVE){
-
 	return i;
       }
     }
-    i++;
-  }
- 
+  } 
   return -1;
 }
 
