@@ -30,6 +30,8 @@ void send_to_all(char *line, int fd, fd_set *master, int fdmax, player *player_l
       }else{
 	sprintf(line,"%s has voted to lynch %s\n", player_list[fd-4].name, player_list[command].name);
       }
+      if(send(fd, line, strlen(line),0 ==-1))
+	printf("SEND: %s\n",strerror(errno));
     }
   }
   int i;
