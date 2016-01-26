@@ -7,7 +7,7 @@ void shuffle(int *roles){
   int i;
   for(i = 0;i < MAX_PLAYERS; i++){
     int lucky = rand()%(MAX_PLAYERS-i) + i;
-    temp = roles[i];
+    int temp = roles[i];
     roles[i] = roles[lucky];
     roles[lucky] == temp;
   }
@@ -32,11 +32,11 @@ int doctor_action(player* player_list){
   for(i = 0; i < MAX_PLAYERS; i++){
     if (player_list[i].status == ALIVE){//if alive
       if (player_list[i].role == DOCTOR){//if doctor
-	int target=player_index(player_list[i].target, player_list);//find index
+	int target = player_list[i].target;
 	if (player_list[target].status == DEAD){//if target is dead
 	  return -1;
 	}
-	player_list[target].mark=HEAL;
+	player_list[target].mark = HEAL;
       }
     }
   }
@@ -47,22 +47,22 @@ int mafia_action(player* player_list){
   for(i = 0; i < MAX_PLAYERS; i++){
     if (player_list[i].status == ALIVE){//if alive
       if (player_list[i].role == MAFIASO){//if mafiaso
-	int target=player_index(player_list[i].target, player_list);
+	int target = player_list[i].target;
 	if (player_list[target].status == DEAD){//if target is dead
 	  return -1;
 	}
-	player_list[target].mark=KILL;
+	player_list[target].mark = KILL;
       }
     }
   }
 }
 
 int cop_action(player* player_list){
-  int size=sizeof(player_list);
+  int i;
   for(i = 0; i < MAX_PLAYERS; i++){
     if (player_list[i].status == ALIVE){
       if (player_list[i].role == COP){
-	int target=player_index(player_list[i].target, player_list);
+	int target = player_list[i].target;
 	if (player_list[target].status == DEAD){//if target is dead
 	  return -1;
 	}

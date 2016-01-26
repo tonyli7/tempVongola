@@ -23,7 +23,7 @@
 
 typedef struct player{
   char name[16];
-  char target[16];
+  int target;
   int role;
   int status;
   int vote;
