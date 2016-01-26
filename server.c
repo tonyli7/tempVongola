@@ -113,7 +113,7 @@ int main() {
   int day = 0;
   int hold = day;//helps to check if day has changed
   int num_players = 0;
-  clock_t start,diff;
+  time_t start,diff;
     
   char **ulist = (char**)calloc(15, sizeof(char *));
   for(i = 0; i < 15; i++){
@@ -124,9 +124,8 @@ int main() {
   FD_ZERO(&read_fds);
   FD_SET(socket_id, &master);
   int fdmax = socket_id;
-
   while(1){
-    //printf("Here\n");
+    //printf("Time:%d\n",time(NULL));
     read_fds = master;
     if(num_players<1){
       num_players=0;
@@ -141,15 +140,18 @@ int main() {
     }
     if(day>=1){
       if (hold!=day){
-	printf("here2\n");
-	start = clock();
+	//printf("here2\n");
+	start = time(NULL);
+	hold=day;
       }
       else{
-	printf("here!\n");
-	diff = clock() - start;
-	printf("%d\n",diff/CLOCKS_PER_SEC);
-	if(diff/CLOCKS_PER_SEC>=10)
+	//printf("here!\n");
+	diff = time(NULL) - start;
+	//printf("%d\n",diff);
+	if(diff>=10){
+	  printf("10 sec\n");
 	  day++;
+	}
       }
     }
     printf("here3\n");
@@ -157,6 +159,7 @@ int main() {
       printf("select: %s\n", strerror(errno));
       exit(0);
     }
+    fflush(stdout);
     if(hold!=day){
       printf("Here4\n");
       char d[20];
