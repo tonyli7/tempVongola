@@ -18,7 +18,7 @@ void send_to_all(char *line, int fd, fd_set *master, int fdmax, player *player_l
     int command = process_cmd(line, player_list[fd-4], player_list, cycle);
     if(command == -1){
       int x;
-      strcpy(line,"");
+      sprintf(line,"Number of votes needed to Lynch: %d\n",num_alive(player_list)/2+1);
       for(x = 0; x < MAX_PLAYERS; x++){
 	sprintf(line+strlen(line), "id: %d Name: %s Status: ", x, player_list[x].name);
 	if(player_list[x].status==ALIVE)
@@ -205,7 +205,7 @@ int main(){
 		sprintf(p,"%s died by lynch\n",player_list[i].name);
 	      else
 		sprintf(p,"%s died by Mafia\n",player_list[i].name);
-	      sprintf(p+strlen(p),"The person's role was %s\n",player_list[i].name);
+	      sprintf(p+strlen(p),"The person's role was %s\n",get_role(player_list[i].role));
 	      strcat(deaths, p);
 	      player_list[i].status=DEAD;
 	    }
