@@ -115,7 +115,7 @@ int main(){
   timeout.tv_sec = 0;
   timeout.tv_usec = 0;
 
-  player* player_list = calloc(MAX_PLAYERS, sizeof(player));
+  player* player_list = calloc(MAX_PLAYERS, 86);
   setup_socket(&socket_id);
   FD_ZERO(&master);
   FD_ZERO(&read_fds);
