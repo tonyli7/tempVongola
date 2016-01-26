@@ -41,14 +41,3 @@ char * trim(char * line){
   }
   return line;
 }
-
-/*int main(){
-  char str[20] = "Test This\n";
-  char *s = str;
-  printf("Num of Tokens: %d\n",count_tokens(s));
-
-  char **list = parse_by_space(s);
-  int i;
-  for(i=0;list[i];i++)
-    printf("%d: %s\n",i,list[i]);
-}*/
