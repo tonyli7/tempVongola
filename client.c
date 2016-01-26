@@ -15,6 +15,8 @@ void get_name(char *buffer, int socket_id){
     printf("Please enter your desired name: ");
     fgets(buffer, 256, stdin);
     buffer[strlen(buffer) - 1] = '\0';
+    if (strchr(buffer, ' '))
+      buffer = NULL;
   }
 }
 
