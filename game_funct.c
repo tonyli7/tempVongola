@@ -232,6 +232,40 @@ int lynch_count(player* player_list ){
   } 
   return -1;
 }
+
+
+player find_by_fd(int fd, player* player_list){
+  int i;
+  for (i = 0; i < size(player_list); i++)
+    if(player_list[i].fd==fd)
+      return player;
+  return NULL;
+}
+int process_cmd(char* line,player p, player* player_list, int cycle){
+  line = trim(line);
+  if(count_tokens(line)==1){
+    if(strstr(line,"/p")){//print out player list
+      //print_playerlist(player_list);
+    }
+  }
+  else if(count_tokens(line)==2){
+    char **ps = parse_by_space(line);
+    if(strstr(ps[0],"/v")){
+      player target;
+      if(target=find_by_fd(ps[1],player_list)){
+	if(cycle%2==0){//if night
+	  if(target.role==MAFIASO&&p.role==MAFIASO){
+	    return 0;
+	  }
+	}
+	if(p.voted){
+	  find_by_fd(voted,player_list).votes-=1;
+	}
+	target.votes+=1;
+      }
+    }
+  }
+}
 /*
 int main(){
   player* player_list=malloc(sizeof(player)*15);
