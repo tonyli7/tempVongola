@@ -13,18 +13,22 @@
 #include "game_funct.h"
 
 
-void send_to_all(char *line, int fd, fd_set *master, int fdmax, int socket_id){
+void send_to_all(char *line, int fd, fd_set *master, int fdmax, int socket_id, player *player_list, int cycle){
   int i;
   for (i = 3; i <= fdmax; i++){
     if (FD_ISSET(i, master) && i != socket_id && i != fd){
-      if(send(i, line, strlen(line), 0) == -1){
-	printf("SEND: %s\n", strerror(errno));
+      if(cycle%2==0&&player_list[fd-4].role!=MAFIASO){}
+      else if(cycle%2==0&&player_list[i-4].role!=MAFIASO){}
+      else{
+	if(send(i, line, strlen(line), 0) == -1){
+	  printf("SEND: %s\n", strerror(errno));
       }
     }
   }
+  }
 }
 
-void process(int fd, fd_set *master, int fdmax, int socket_id, player *player_list, int *num_players){
+void process(int fd, fd_set *master, int fdmax, int socket_id, player *player_list, int *num_players, int cycle){
   char buffer[256] = "";
   char line[256] = "";
   int num_bytes;
@@ -50,7 +54,7 @@ void process(int fd, fd_set *master, int fdmax, int socket_id, player *player_li
     sprintf(line, "%s: %s", player_list[fd-4].name, buffer);
   }
   if(strlen(line) > 0){
-    send_to_all(line, fd, master, fdmax, socket_id);
+    send_to_all(line, fd, master, fdmax, socket_id, player_list, cycle);
   }
 }
 
@@ -137,7 +141,7 @@ int main(){
 	}else{
 	  sprintf(d, "Start of Night %d\n", cycle/2);
 	}
-	send_to_all(d, 0, &master, fdmax, socket_id);
+	send_to_all(d, 0, &master, fdmax, socket_id, player_list, 1);
 	hold = cycle;
       }
       else{
@@ -155,7 +159,7 @@ int main(){
 	if(i == socket_id){//if a client is trying to connect
 	  accept_client(socket_id, &master, &fdmax, player_list);
 	}else{
-	  process(i, &master, fdmax, socket_id, player_list, &num_players);
+	  process(i, &master, fdmax, socket_id, player_list, &num_players, cycle);
 	}
       }
     }
