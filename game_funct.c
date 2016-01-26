@@ -170,12 +170,12 @@ int process_cmd(char *line, player p, player *player_list, int cycle){
     if(target >= 0 || target < MAX_PLAYERS){
       if((cycle%2  == 0 && player_list[target].role != MAFIOSO && p.role == MAFIOSO) || cycle%2 == 1){
 	printf("HERE\n");
-	if(p.mark != -1){
+	/*if(p.mark != -1){
 	  player_list[p.mark].vote -= 1;
 	}
 	p.mark += target+1;
 	printf("Mark,Target: %s %d, %s %d\n",p.name,p.mark,player_list[target].name,target);
-	player_list[target].vote += 1;
+	player_list[target].vote += 1;*/
 	return target;
       }
     }

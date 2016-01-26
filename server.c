@@ -20,7 +20,7 @@ void send_to_all(char *line, int fd, fd_set *master, int fdmax, player *player_l
       int x;
       strcpy(line,"");
       for(x = 0; x < MAX_PLAYERS; x++){
-	sprintf(line+strlen(line), "mark:%d id: %d Name: %s Status:",player_list[x].mark, x, player_list[x].name);
+	sprintf(line+strlen(line), "id: %d Name: %s Status:", x, player_list[x].name);
 	if(player_list[x].status==ALIVE)
 	  sprintf(line+strlen(line), "ALIVE Votes: %d\n",player_list[x].vote);
 	else
@@ -36,6 +36,11 @@ void send_to_all(char *line, int fd, fd_set *master, int fdmax, player *player_l
       }else{
 	sprintf(line,"%s has voted to lynch %s\n", player_list[fd-4].name, player_list[command].name);
       }
+      if(player_list[fd-4].mark != -1)
+	player_list[fd-4].vote-=1;
+      player_list[fd-4].mark=command;
+      player_list[command].vote +=1;
+      
       if(send(fd, line, strlen(line),0 ==-1))
 	printf("SEND: %s\n",strerror(errno));
     }
@@ -182,11 +187,7 @@ int main(){
 	 
 
 	  process_votes(player_list, cycle-1);
-<<<<<<< HEAD
-	  //printf("after process: %d\n",player_list[0].mark);
-=======
-	 
->>>>>>> 1f5dead4050caa08885ed3593aeb7cf60c206b9a
+
 	  for(i = 0; i < MAX_PLAYERS; i++){
 	    if(player_list[i].status == JUST_DEAD){
 	      char *p = (char *)malloc(sizeof(char));
