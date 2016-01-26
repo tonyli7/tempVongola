@@ -10,7 +10,7 @@ void shuffle(int *roles){
     int lucky = rand()%(MAX_PLAYERS-i) + i;
     int temp = roles[i];
     roles[i] = roles[lucky];
-    roles[lucky] == temp;
+    roles[lucky] = temp;
   }
 }
 
