@@ -12,7 +12,6 @@
 
 #include "game_funct.h"
 
-
 void send_to_all(char *line, int fd, fd_set *master, int fdmax, player *player_list, int cycle){
   if(fd != 0){
     int command = process_cmd(line, player_list[fd-4], player_list, cycle);

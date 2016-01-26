@@ -40,6 +40,7 @@ void process(int fd, int sockfd, char *name){//controls sending and receiving
 	send(sockfd, name, strlen(name), 0);
       }
     }
+    
       buffer[num_bytes]='\0';
       printf("%s", buffer);//print the message received out
       fflush(stdout);
