@@ -16,6 +16,7 @@ void send_to_all(char *line, int fd, fd_set *master, int fdmax, player *player_l
   if(fd != 0){
     int command = process_cmd(line, player_list[fd-4], player_list, cycle);
     if(command == -1){
+      printf("GOOD\n");
       int x;
       for(x = 0; x < MAX_PLAYERS; x++){
 	if(player_list[x].status == ALIVE){

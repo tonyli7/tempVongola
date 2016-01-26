@@ -156,15 +156,13 @@ int num_alive(player* player_list){
 }
 
 int process_cmd(char *line, player p, player *player_list, int cycle){
-  printf("%s\n", line);
   char *command = malloc(256);
   strcpy(command, line);
-  printf("%s\n", command);
   char *saveptr;
   strtok_r(command, " ", &saveptr);
   command = strtok_r(NULL, " ", &saveptr);
   char * next = strtok_r(NULL, " ", &saveptr);
-  if(!strcmp("/p", command)){
+  if(!strncmp("/p", command, 2)){
     return -1;
   }else if(!strcmp("/v", command)){
     char *endptr = (next+1);
@@ -175,7 +173,6 @@ int process_cmd(char *line, player p, player *player_list, int cycle){
 	  player_list[p.mark].vote -= 1;
 	}
 	player_list[target].vote += 1;
-	printf("%d\n", target);
 	return target;
       }
     }
