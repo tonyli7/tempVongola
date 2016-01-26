@@ -24,12 +24,11 @@ void send_to_all(char *line, int fd, fd_set *master, int fdmax, player *player_l
 	if(player_list[x].status==ALIVE)
 	  sprintf(line+strlen(line), "ALIVE Votes: %d",player_list[x].vote);
 	else
-	  sprintf(line+strlen(line), "DEAD Role: %s\n",get_role(player_list[x].role));
+	  sprintf(line+strlen(line), "DEAD Role: %s",get_role(player_list[x].role));
 	if(player_list[x].role==MAFIOSO&&player_list[fd-4].role==MAFIOSO&&player_list[x].status==ALIVE){
-	  strcat(line," Role: MAFIOSO\n");
+	  strcat(line," Role: MAFIOSO");
 	}
-	else if(player_list[x].status==ALIVE)
-	  strcat(line,"\n");
+	strcat(line,"\n");
 	    
       }
       send(fd, line, strlen(line), 0);
@@ -37,7 +36,7 @@ void send_to_all(char *line, int fd, fd_set *master, int fdmax, player *player_l
     }
     else if(cycle==1){//no votes on Day 1
     }
-    else if(command < MAX_PLAYERS){
+    else if(command < MAX_PLAYERS && player_list[command].status==ALIVE){
       if(cycle%2 == 0){
 	sprintf(line, "%s has voted to kill %s\n", player_list[fd-4].name, player_list[command].name);
       }else{
