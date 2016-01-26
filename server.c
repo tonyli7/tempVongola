@@ -205,6 +205,7 @@ int main(){
 		sprintf(p,"%s died by lynch\n",player_list[i].name);
 	      else
 		sprintf(p,"%s died by Mafia\n",player_list[i].name);
+	      sprintf(p+strlen(p),"The person's role was %s\n",player_list[i].name);
 	      strcat(deaths, p);
 	      player_list[i].status=DEAD;
 	    }
