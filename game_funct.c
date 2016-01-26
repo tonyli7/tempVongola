@@ -118,7 +118,7 @@ void print_dead(player* player_list){
 
 void print_alive(player* player_list){
   int i;
-  printf("The Living:\n\n");
+  printf("Players:\n");
   for(i = 0; i < MAX_PLAYERS; i++){
     if (player_list[i].status == ALIVE){
       printf("Name: %s ", player_list[i].name);      
@@ -167,7 +167,7 @@ int process_cmd(char *line, player p, player *player_list, int cycle){
   }else if(!strcmp("/v", command)){
     char *endptr = (next+1);
     int target = strtol(next, &endptr, 10);
-    if(target >= 0 || target < MAX_PLAYERS){
+    if(target >= 0 || target < MAX_PLAYERS && player_list[target].status==ALIVE){
       if((cycle%2  == 0 && player_list[target].role != MAFIOSO && p.role == MAFIOSO) || cycle%2 == 1){
 	printf("HERE\n");
 	/*if(p.mark != -1){

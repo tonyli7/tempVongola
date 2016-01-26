@@ -13,14 +13,15 @@
 #include "game_funct.h"
 
 void send_to_all(char *line, int fd, fd_set *master, int fdmax, player *player_list, int cycle){
+  //printf("HERE9\n");
   if(fd != 0){
     int command = process_cmd(line, player_list[fd-4], player_list, cycle);
-    printf("after command: %d\n",player_list[fd-4].mark);
+    //printf("after command: %d\n",player_list[fd-4].mark);
     if(command == -1){
       int x;
       strcpy(line,"");
       for(x = 0; x < MAX_PLAYERS; x++){
-	sprintf(line+strlen(line), "id: %d Name: %s Status:", x, player_list[x].name);
+	sprintf(line+strlen(line), "id: %d Name: %s Status: ", x, player_list[x].name);
 	if(player_list[x].status==ALIVE)
 	  sprintf(line+strlen(line), "ALIVE Votes: %d\n",player_list[x].vote);
 	else
@@ -29,7 +30,8 @@ void send_to_all(char *line, int fd, fd_set *master, int fdmax, player *player_l
       send(fd, line, strlen(line), 0);
       return;
     }
-    else if(cycle==1){}
+    else if(cycle==1){//no votes on Day 1
+    }
     else if(command < MAX_PLAYERS){
       if(cycle%2 == 0){
 	sprintf(line, "%s has voted to kill %s\n", player_list[fd-4].name, player_list[command].name);
@@ -41,18 +43,29 @@ void send_to_all(char *line, int fd, fd_set *master, int fdmax, player *player_l
       player_list[fd-4].mark=command;
       player_list[command].vote +=1;
       
-      if(send(fd, line, strlen(line),0 ==-1))
+      if(send(fd, line, strlen(line),0) ==-1)
 	printf("SEND: %s\n",strerror(errno));
     }
   }
   int i;
+  //printf("HERE10\n");
   for (i = 4; i <= fdmax; i++){
     if (FD_ISSET(i, master) && i != fd){
-      if((cycle%2 == 0 && player_list[fd-4].role == MAFIOSO && player_list[i-4].role == MAFIOSO) || cycle%2 == 1){
+      //printf("HERE12\n");
+      if((cycle && cycle%2 == 0 && player_list[fd-4].role == MAFIOSO && player_list[i-4].role == MAFIOSO) || cycle%2 == 1){
+	//printf("HERE13\n");
+	if(player_list[fd-4].status==ALIVE)
+	  if(send(i, line, strlen(line), 0) == -1){
+	    printf("SEND: %s\n", strerror(errno));
+	  }
+	//printf("AFTER CMD: %d\n",player_list[i-4].mark);
+	//printf("HERE14\n");
+      }
+      else if(cycle==0){
+	//printf("HERE11\n");
 	if(send(i, line, strlen(line), 0) == -1){
-	  printf("SEND: %s\n", strerror(errno));
+	  printf("SEND: %s\n",strerror(errno));
 	}
-	printf("AFTER CMD: %d\n",player_list[i-4].mark);
       }
     }
   }
@@ -163,6 +176,7 @@ int main(){
   while(1){
     read_fds = master;
     if (num_players == MAX_PLAYERS && cycle == 0){//once num_players has reached a number, game begins
+      printf("HERE\n");
       cycle = 1;
       assign_roles(player_list);
       for(i = 0; i < MAX_PLAYERS; i++){
@@ -177,17 +191,17 @@ int main(){
       print_alive(player_list);
     }
     if(cycle >= 1){
-      
+      //printf("HERE2\n");
       
       if (hold != cycle){
 	start = time(NULL);
-	char d[20];
+	char d[20]="";
+	//printf ("HERE3\n");
 	char deaths[256]="";
 	if(cycle > 1){
-	 
-
+	  //printf("HERE5\n");
 	  process_votes(player_list, cycle-1);
-
+	  //printf ("HERE4\n");
 	  for(i = 0; i < MAX_PLAYERS; i++){
 	    if(player_list[i].status == JUST_DEAD){
 	      char *p = (char *)malloc(sizeof(char));
@@ -199,28 +213,31 @@ int main(){
 	      player_list[i].status=DEAD;
 	    }
 	  }
-	  send_to_all(deaths, 0, &master, fdmax, player_list,1);
+	  send_to_all(deaths, 0, &master, fdmax, player_list,0);
 	  /*---------victory stuff--------------*/
 	 
 	  if (victory(player_list) == TOWNIE){
 	    char msg[]="Town wins!\n\n";
 	   
-	    send_to_all(msg, 0, &master, fdmax, player_list,1);
+	    send_to_all(msg, 0, &master, fdmax, player_list,0);
 	    exit(0);
 	  }else if (victory(player_list) == MAFIOSO){
 	    char msg[]="Mafia wins!\n\n";
-	    send_to_all(msg, 0, &master, fdmax, player_list,1);
+	    send_to_all(msg, 0, &master, fdmax, player_list,0);
 	  
 	    exit(0);
 	  }
 	  //-------------------------------------
 	}
+	//printf("HERE6\n");
 	if(cycle %2 == 1){
 	  sprintf(d, "Start of Day %d\n", cycle/2+1);
 	}else{
 	  sprintf(d, "Start of Night %d\n", cycle/2);
 	}
-	send_to_all(d, 0, &master, fdmax, player_list, 1);
+	//printf("HERE7\n");
+	send_to_all(d, 0, &master, fdmax, player_list, 0);
+	//printf("HERE8\n");
 	for(i = 0; i < MAX_PLAYERS; i++){
 	  player_list[i].vote=0;
 	  //printf("by reset: %d\n",player_list[i].mark);
@@ -229,9 +246,20 @@ int main(){
 	hold = cycle;
       }
       else{
-	if(time(NULL) - start >= 10){
-	  cycle++;
+	if(cycle == 1){
+	  if(time(NULL) - start >= 10)
+	    cycle++;
 	}
+        else if(cycle%2==1){
+	  if(time(NULL) - start >= 45)
+	    cycle++;
+	}
+	else{
+	  if(time(NULL) - start >= 30)
+	    cycle++;
+	}
+	    
+	    
       }
     }
     if (select(fdmax+1, &read_fds, NULL, NULL, &timeout) == -1){
