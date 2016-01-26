@@ -168,6 +168,14 @@ int main(){
       print_alive(player_list);
     }
     if(cycle >= 1){
+      if (victory(player_list) == TOWNIE){
+	printf("Town wins!\n\n");
+	exit(0);
+      }else if (victory(player_list) == MAFIOSO){
+	printf("Mafia wins!\n\n");
+	exit(0);
+      }
+      
       if (hold != cycle){
 	start = time(NULL);
 	char d[20];

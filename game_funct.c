@@ -196,3 +196,25 @@ void process_votes(player* player_list,int cycle){
 	player_list[i].status = JUST_DEAD;
   }
 }
+
+int victory(player* player_list){
+  int i=0;
+  int mafCount=0;
+  int townCount=0;
+  while (i<MAX_PLAYERS){
+    if (player_list[i].status == ALIVE){
+      if (player_list[i].role == MAFIOSO){
+	mafCount++;
+      }else{
+	townCount++;
+      }
+    }
+    i++;
+  }
+  if (!mafCount){
+    return TOWNIE;
+  }else if (!townCount){
+    return MAFIOSO;
+  }
+  return -1;
+}
