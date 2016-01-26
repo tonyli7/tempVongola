@@ -92,6 +92,9 @@ void process(int fd, fd_set *master, int fdmax, int socket_id, player *player_li
     strncpy(player_list[fd-4].name, buffer, 15);
     (*num_players)++;
     sprintf(line, "%s has entered the town.\n", player_list[fd-4].name);
+    sprintf(line+strlen(line), "There are %d people in the town. We need %d to start.\n",*num_players,MAX_PLAYERS);
+    send_to_all(line, 0, master, fdmax, player_list, 0);
+    line[0]='\0';
   }else{
     sprintf(line, "%s: %s", player_list[fd-4].name, buffer);
   }
@@ -111,7 +114,7 @@ void setup_socket(int *socket_id){
   //Bind to port/address
   struct sockaddr_in listener;
   listener.sin_family = AF_INET; //Socket type IPv4
-  listener.sin_port = htons(56349); //Port #
+  listener.sin_port = htons(56348); //Port #
   listener.sin_addr.s_addr = INADDR_ANY; //Bind to any incoming address
 
   int on = 1;
@@ -183,8 +186,9 @@ int main(){
       assign_roles(player_list);
       for(i = 0; i < MAX_PLAYERS; i++){
 	if(FD_ISSET(i+4, &master)){
-	  char buffer[64];
-	  sprintf(buffer, "You are a %s.\n", get_role(player_list[i].role));
+	  char buffer[1024];
+	  strcpy(buffer,"\nThe Game Has Started\n\nType in '/p' to view player list\nType in '/v' followed by a space and an id to vote.\n");
+		  sprintf(buffer+strlen(buffer), "\nYou are a %s.\n", get_role(player_list[i].role));
 	  if(send(i+4, buffer, strlen(buffer), 0) == -1){
 	    printf("SEND: %s\n", strerror(errno));
 	  }
@@ -214,12 +218,12 @@ int main(){
 	  send_to_all(deaths, 0, &master, fdmax, player_list,0);
 	  /*---------victory stuff--------------*/
 	  if (victory(player_list) == TOWNIE){
-	    char msg[]="Town wins!\n\n";
+	    char msg[]="\nTown wins!\n";
 	   
 	    send_to_all(msg, 0, &master, fdmax, player_list,0);
 	    exit(0);
 	  }else if (victory(player_list) == MAFIOSO){
-	    char msg[]="Mafia wins!\n\n";
+	    char msg[]="\nMafia wins!\n";
 	    send_to_all(msg, 0, &master, fdmax, player_list,0);
 	  
 	    exit(0);
@@ -228,9 +232,9 @@ int main(){
 	}
 	//printf("HERE6\n");
 	if(cycle %2 == 1){
-	  sprintf(d, "Start of Day %d\n", cycle/2+1);
+	  sprintf(d, "\nStart of Day %d\n", cycle/2+1);
 	}else{
-	  sprintf(d, "Start of Night %d\n", cycle/2);
+	  sprintf(d, "\nStart of Night %d\n", cycle/2);
 	}
 	//printf("HERE7\n");
 	send_to_all(d, 0, &master, fdmax, player_list, 0);

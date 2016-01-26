@@ -59,7 +59,7 @@ void setup_socket(int *socket_id){
 
   struct sockaddr_in sock;
   sock.sin_family = AF_INET;
-  sock.sin_port = htons(56349);
+  sock.sin_port = htons(56348);
   //Set the IP address to connect to
   //127.0.0.1 is the "loopback" address of any machine
   inet_aton("127.0.0.1", &(sock.sin_addr));
