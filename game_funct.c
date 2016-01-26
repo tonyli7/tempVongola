@@ -123,11 +123,27 @@ void print_alive(player* player_list){
     if (player_list[i].status == ALIVE){
       printf("Name: %s ", player_list[i].name);      
       printf("Role: %s\n", get_role(player_list[i].role));
-      printf("Votes: %d\n", player_list[i].vote);
+      //printf("Votes: %d\n", player_list[i].vote);
     }
   }
 }
 
+void print_players(player* player_list){
+  int i;
+  printf("People:\n");
+  for(i = 0; i < MAX_PLAYERS; i++){
+    printf("Name: %s ", player_list[i].name);
+    if (player_list[i].status==ALIVE){
+      printf("Status: ALIVE ");
+      printf("Role: Not Revealed ");
+      printf("Votes: %d\n", player_list[i].vote);
+    }
+    else{
+      printf("Status: DEAD ");
+      printf("Role: %s\n", get_role(player_list[i].role));
+    }
+  }
+}
 int num_alive(player* player_list){
   int i;
   int alive = 0;
