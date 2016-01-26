@@ -28,7 +28,7 @@ void send_to_all(char *line, int fd, fd_set *master, int fdmax, player *player_l
 	if(player_list[x].role==MAFIOSO&&player_list[fd-4].role==MAFIOSO&&player_list[x].status==ALIVE){
 	  strcat(line," Role: MAFIOSO\n");
 	}
-	else
+	else if(player_list[x].status==ALIVE)
 	  strcat(line,"\n");
 	    
       }
