@@ -19,7 +19,11 @@ void send_to_all(char *line, int fd, fd_set *master, int fdmax, int socket_id, p
   for (i = 3; i <= fdmax; i++){
     if (FD_ISSET(i, master) && i != socket_id && i != fd){
       printf("HERE\n");
-      if(cycle%2==0){
+      if(cycle==0){
+	if(send(i,line,strlen(line),0)==-1)
+	  printf("SEND: %s\n", strerror(errno));
+      }
+      else if(cycle%2==0){
 	printf("HERE2\n");
 	if(player_list[fd-4].role!=MAFIOSO||player_list[i-4].role!=MAFIOSO){}
 	/*else if(process_cmd(line,player_list[fd-4],player_list,cycle)){
