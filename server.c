@@ -168,20 +168,17 @@ int main(){
       print_alive(player_list);
     }
     if(cycle >= 1){
-      if (victory(player_list) == TOWNIE){
-	printf("Town wins!\n\n");
-	exit(0);
-      }else if (victory(player_list) == MAFIOSO){
-	printf("Mafia wins!\n\n");
-	exit(0);
-      }
+      
       
       if (hold != cycle){
 	start = time(NULL);
 	char d[20];
 	char deaths[256]="Deaths\n";
 	if(cycle > 1){
+	 
+
 	  process_votes(player_list, cycle-1);
+	 
 	  for(i = 0; i < MAX_PLAYERS; i++){
 	    if(player_list[i].status == JUST_DEAD){
 	      char *p = (char *)malloc(sizeof(char));
@@ -194,6 +191,20 @@ int main(){
 	    }
 	  }
 	  send_to_all(deaths, 0, &master, fdmax, player_list,1);
+	  /*---------victory stuff--------------*/
+	 
+	  if (victory(player_list) == TOWNIE){
+	    char msg[]="Town wins!\n\n";
+	   
+	    send_to_all(msg, 0, &master, fdmax, player_list,1);
+	    exit(0);
+	  }else if (victory(player_list) == MAFIOSO){
+	    char msg[]="Mafia wins!\n\n";
+	    send_to_all(msg, 0, &master, fdmax, player_list,1);
+	  
+	    exit(0);
+	  }
+	  //-------------------------------------
 	}
 	if(cycle %2 == 1){
 	  sprintf(d, "Start of Day %d\n", cycle/2+1);
