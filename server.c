@@ -69,6 +69,12 @@ void setup_socket(int *socket_id){
   listener.sin_port = htons(56349); //Port #
   listener.sin_addr.s_addr = INADDR_ANY; //Bind to any incoming address
 
+  int on = 1;
+  if(setsockopt(*socket_id, SOL_SOCKET, SO_REUSEADDR, &on, sizeof(*socket_id)) == -1){
+    printf("setsockopt: %s\n", strerror(errno));
+    exit(0);
+  }
+
   if(bind(*socket_id, (struct sockaddr *)&listener, sizeof(listener)) == -1){
     printf("bind: %s\n", strerror(errno));
     exit(0);
