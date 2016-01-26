@@ -147,19 +147,18 @@ int process_cmd(char *line, player p, player *player_list, int cycle){
   strtok_r(command, " ", &saveptr);
   command = strtok_r(NULL, " ", &saveptr);
   char * next = strtok_r(NULL, " ", &saveptr);
-  printf("%s\n", command);
-  printf("%s\n", next);
-  if(!strcmp("/p", line)){
+  if(!strcmp("/p", command)){
     return -1;
-  }else if(!strcmp("/v", line)){
+  }else if(!strcmp("/v", command)){
     char *endptr = (next+1);
     int target = strtol(next, &endptr, 10);
-    if(target >= 0 || target <= MAX_PLAYERS){
+    if(target >= 0 || target < MAX_PLAYERS){
       if((cycle%2  == 0 && player_list[target].role == MAFIOSO && p.role == MAFIOSO) || cycle%2 == 1){
 	if(p.mark != -1){
 	  player_list[p.mark].vote -= 1;
 	}
 	player_list[target].vote += 1;
+	printf("%d\n", target);
 	return target;
       }
     }

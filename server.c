@@ -22,6 +22,8 @@ void send_to_all(char *line, int fd, fd_set *master, int fdmax, player *player_l
 	  sprintf(line, "%d %s\n", x, player_list[x].name);
 	}
       }
+      send(fd, line, strlen(line), 0);
+      return;
     }else if(command < MAX_PLAYERS){
       if(cycle%2 == 0){
 	sprintf(line, "%s has voted to kill %s\n", player_list[fd-4].name, player_list[player_list[fd-4].mark].name);
