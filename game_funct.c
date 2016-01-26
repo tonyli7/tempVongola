@@ -173,8 +173,8 @@ int process_cmd(char *line, player p, player *player_list, int cycle){
 	if(p.mark != -1){
 	  player_list[p.mark].vote -= 1;
 	}
-	p.mark = target;
-	printf("Mark,Target: %d, %d\n",p.mark,target);
+	p.mark += target+1;
+	printf("Mark,Target: %s %d, %s %d\n",p.name,p.mark,player_list[target].name,target);
 	player_list[target].vote += 1;
 	return target;
       }
