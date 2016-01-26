@@ -10,6 +10,8 @@
 
 #include <time.h>
 
+#include "game_funct.h"
+
 void send_to_all(char *line, int fd, fd_set *master, int fdmax, int socket_id){
   int i;
   for (i = 3; i <= fdmax; i++){
@@ -108,6 +110,8 @@ void accept_client(int *socket_id, fd_set *master, int *fdmax){
 }
 
 int main() {
+ 
+
   int socket_id, i;
   fd_set master, read_fds;
   int cycle = 0;
@@ -137,6 +141,17 @@ int main() {
     }
     if (num_players >= 2 && cycle == 0){//once num_players has reached a number, game begins
       cycle = 1;
+      //lets go
+      player* player_list=malloc(sizeof(player)*5);
+      i=0;
+      while (i<num_players){
+	strcat(player_list[i].name, ulist[i]);
+	player_list[i].status = ALIVE;
+	i++;
+      }
+      assign_roles(player_list);
+      print_ALIVE(player_list);
+      
     }
     if(cycle >= 1){
       if (hold!=cycle){

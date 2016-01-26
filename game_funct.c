@@ -30,11 +30,11 @@ void assign_roles(player* player_list){
   int* roles=malloc(8);
   
   roles[0]=1;
-  roles[1]=1;
-  roles[2]=2;
-  roles[3]=3;
+  //roles[1]=1;
+  //roles[2]=1;
+  //roles[3]=1;
  
-  int i=4;
+  int i=1;
 
   while (i < size){
     roles[i]=0;
@@ -232,7 +232,7 @@ int lynch_count(player* player_list ){
   } 
   return -1;
 }
-
+/*
 int main(){
   player* player_list=malloc(sizeof(player)*15);
  
@@ -273,3 +273,4 @@ int main(){
   print_ALIVE(player_list);
   print_DEAD(player_list);
 }
+*/
