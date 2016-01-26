@@ -24,7 +24,7 @@ void send_to_all(char *line, int fd, fd_set *master, int fdmax, int socket_id){
   }
 }
 
-void process(int fd, fd_set *master, int fdmax, int socket_id, player* player_list){
+void process(int fd, fd_set *master, int fdmax, int socket_id, player *player_list, int *num_players){
   char buffer[256] = "";
   char line[256] = "";
   int num_bytes;
@@ -43,10 +43,13 @@ void process(int fd, fd_set *master, int fdmax, int socket_id, player* player_li
   }else if(strlen(player_list[fd-4].name) == 0){
     strncpy(player_list[fd-4].name, buffer, 15);
     player_list[fd-4].name[15] = '\0';
+    printf("%s\n", player_list[fd-4].name);
+    (*num_players)++;
     sprintf(line, "%s has entered the town.\n", player_list[fd-4].name);
   }else{
     sprintf(line, "%s: %s", player_list[fd-4].name, buffer);
   }
+  printf("%s\n", line);
   if(strlen(line) > 0){
     send_to_all(line, fd, master, fdmax, socket_id);
   }
@@ -63,7 +66,7 @@ void setup_socket(int *socket_id){
   //Bind to port/address
   struct sockaddr_in listener;
   listener.sin_family = AF_INET; //Socket type IPv4
-  listener.sin_port = htons(56348); //Port #
+  listener.sin_port = htons(56349); //Port #
   listener.sin_addr.s_addr = INADDR_ANY; //Bind to any incoming address
 
   if(bind(*socket_id, (struct sockaddr *)&listener, sizeof(listener)) == -1){
@@ -77,7 +80,7 @@ void setup_socket(int *socket_id){
   }
 }
 
-void accept_client(int socket_id, fd_set *master, int *fdmax, player *player_list, int *num_players){
+void accept_client(int socket_id, fd_set *master, int *fdmax, player *player_list){
   struct sockaddr_in client_addr;
   socklen_t addrlen = sizeof(client_addr);
   int client_socket = accept(socket_id, (struct sockaddr*)&client_addr, &addrlen);
@@ -96,10 +99,7 @@ void accept_client(int socket_id, fd_set *master, int *fdmax, player *player_lis
       if(client_socket > *fdmax){
 	*fdmax = client_socket;
       }
-      printf("WHY\n");
       player_list[client_socket - 4].status = ALIVE;
-      (*num_players)++;
-      printf("MAYBE\n");
     }
   }
 }
@@ -154,9 +154,9 @@ int main(){
     for(i = 3; i <= fdmax; i++){
       if(FD_ISSET(i, &read_fds)){
 	if(i == socket_id){//if a client is trying to connect
-	  accept_client(socket_id, &master, &fdmax, player_list, &num_players);
+	  accept_client(socket_id, &master, &fdmax, player_list);
 	}else{
-	  process(i, &master, fdmax, socket_id, player_list);
+	  process(i, &master, fdmax, socket_id, player_list, &num_players);
 	}
       }
     }
