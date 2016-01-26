@@ -11,6 +11,8 @@ void assign_roles(player* player_list){
   for(i = 0;  i < MAX_PLAYERS; i++){
     roles[i]=0;
   }
+  roles[0]=1;
+  roles[1]=1;
 
   for(i = 0; i < MAX_PLAYERS; i++){
     player_list[i].role=roles[i];
