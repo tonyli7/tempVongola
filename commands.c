@@ -17,7 +17,7 @@ int count_tokens(char * line){
   return count;
 }
 
-char **parse_by_space(char * source){
+char * *parse_by_space(char * source){
   char *line = source;
   line = strsep(&line,"\n");
   char **ps=(char **)malloc((count_tokens(line)+1)*sizeof(char*));
