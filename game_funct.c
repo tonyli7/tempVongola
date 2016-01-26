@@ -169,13 +169,6 @@ int process_cmd(char *line, player p, player *player_list, int cycle){
     int target = strtol(next, &endptr, 10);
     if(target >= 0 || target < MAX_PLAYERS){
       if((cycle%2  == 0 && player_list[target].role != MAFIOSO && p.role == MAFIOSO) || cycle%2 == 1){
-	printf("HERE\n");
-	/*if(p.mark != -1){
-	  player_list[p.mark].vote -= 1;
-	}
-	p.mark += target+1;
-	printf("Mark,Target: %s %d, %s %d\n",p.name,p.mark,player_list[target].name,target);
-	player_list[target].vote += 1;*/
 	return target;
       }
     }
@@ -198,10 +191,10 @@ void process_votes(player* player_list,int cycle){
 }
 
 int victory(player* player_list){
-  int i=0;
-  int mafCount=0;
-  int townCount=0;
-  while (i<MAX_PLAYERS){
+  int i;
+  int mafCount = 0;
+  int townCount = 0;
+  for(i = 0; i < MAX_PLAYERS; i++){
     if (player_list[i].status == ALIVE){
       if (player_list[i].role == MAFIOSO){
 	mafCount++;
@@ -209,7 +202,6 @@ int victory(player* player_list){
 	townCount++;
       }
     }
-    i++;
   }
   if (!mafCount){
     return TOWNIE;

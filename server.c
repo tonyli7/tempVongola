@@ -15,7 +15,6 @@
 void send_to_all(char *line, int fd, fd_set *master, int fdmax, player *player_list, int cycle){
   if(fd != 0){
     int command = process_cmd(line, player_list[fd-4], player_list, cycle);
-    printf("after command: %d\n",player_list[fd-4].mark);
     if(command == -1){
       int x;
       strcpy(line,"");
@@ -52,7 +51,6 @@ void send_to_all(char *line, int fd, fd_set *master, int fdmax, player *player_l
 	if(send(i, line, strlen(line), 0) == -1){
 	  printf("SEND: %s\n", strerror(errno));
 	}
-	printf("AFTER CMD: %d\n",player_list[i-4].mark);
       }
     }
   }
@@ -176,18 +174,13 @@ int main(){
       }
       print_alive(player_list);
     }
-    if(cycle >= 1){
-      
-      
+    if(cycle >= 1){     
       if (hold != cycle){
 	start = time(NULL);
 	char d[20];
 	char deaths[256]="";
 	if(cycle > 1){
-	 
-
 	  process_votes(player_list, cycle-1);
-
 	  for(i = 0; i < MAX_PLAYERS; i++){
 	    if(player_list[i].status == JUST_DEAD){
 	      char *p = (char *)malloc(sizeof(char));
@@ -201,7 +194,6 @@ int main(){
 	  }
 	  send_to_all(deaths, 0, &master, fdmax, player_list,1);
 	  /*---------victory stuff--------------*/
-	 
 	  if (victory(player_list) == TOWNIE){
 	    char msg[]="Town wins!\n\n";
 	   
@@ -223,7 +215,6 @@ int main(){
 	send_to_all(d, 0, &master, fdmax, player_list, 1);
 	for(i = 0; i < MAX_PLAYERS; i++){
 	  player_list[i].vote=0;
-	  //printf("by reset: %d\n",player_list[i].mark);
 	  player_list[i].mark=-1;
 	}
 	hold = cycle;
@@ -244,7 +235,6 @@ int main(){
 	  accept_client(socket_id, &master, &fdmax, player_list);
 	}else{
 	  process(i, &master, fdmax, socket_id, player_list, &num_players, cycle);
-	  //printf("After process2: %d",player_list[i-4].mark);
 	}
       }
     }
