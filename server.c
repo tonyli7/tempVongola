@@ -71,8 +71,8 @@ void send_to_all(char *line, int fd, fd_set *master, int fdmax, player *player_l
 } 
 
 void process(int fd, fd_set *master, int fdmax, int socket_id, player *player_list, int *num_players, int cycle){
-  char buffer[256] = "";
-  char line[256] = "";
+  char buffer[1024] = "";
+  char line[1024] = "";
   int num_bytes;
   num_bytes = recv(fd, buffer, sizeof(buffer), 0);
   buffer[num_bytes] = '\0';
@@ -179,6 +179,7 @@ int main(){
     if (num_players == MAX_PLAYERS && cycle == 0){//once num_players has reached a number, game begins
       printf("HERE\n");
       cycle = 1;
+      srand(time(NULL));
       assign_roles(player_list);
       for(i = 0; i < MAX_PLAYERS; i++){
 	if(FD_ISSET(i+4, &master)){
