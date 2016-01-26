@@ -1,5 +1,5 @@
 #ifndef TOWNIE
-#define MAX_PLAYERS 3
+#define MAX_PLAYERS 9
 
 //--------ROLES----------
 #define TOWNIE 0
