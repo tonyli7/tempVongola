@@ -18,14 +18,19 @@ void send_to_all(char *line, int fd, fd_set *master, int fdmax, int socket_id, p
 
   for (i = 3; i <= fdmax; i++){
     if (FD_ISSET(i, master) && i != socket_id && i != fd){
+      printf("HERE\n");
       if(cycle%2==0){
+	printf("HERE2\n");
 	if(player_list[fd-4].role!=MAFIOSO||player_list[i-4].role!=MAFIOSO){}
 	else if(process_cmd(line,player_list[fd-4],player_list,cycle))
 	  sprintf(line,"%s has voted to kill %s\n",player_list[fd-4].name,player_list[player_list[fd-4].mark].name);
       }
       else{
-	if(process_cmd(line,player_list[fd-4],player_list,cycle))
-	  sprintf(line,"%s has voted to lynch %s\n",player_list[fd-4].name,player_list[player_list[fd-4].mark].name);
+	printf("HERE3 %s\n",line);
+	if(cycle>1&&process_cmd(line,player_list[fd-4],player_list,cycle)){
+	  printf("HERE4\n");
+	  sprintf(line,"%s has voted to lynch %s\n",player_list[fd-4].name,player_list[player_list[fd-4].mark].name);}
+	printf("HERE5\n");
 	if(send(i, line, strlen(line), 0) == -1)
 	  printf("SEND: %s\n", strerror(errno));
 	}
@@ -158,7 +163,8 @@ int main(){
 	char d[20];
 	char deaths[256]="Deaths\n";
 	printf("Here4\n");
-	process_votes(player_list,cycle);
+	if(cycle>1){
+	  process_votes(player_list,cycle);
 	for(i = 0; i < MAX_PLAYERS; i++){
 	  if(player_list[i].status==JUST_DEAD){
 	    char *p = (char *)malloc(sizeof(char));
@@ -171,12 +177,15 @@ int main(){
 	    player_list[i].status=DEAD;
 	  }
 	}
+	}
+	printf("Here5\n");
 	if(cycle %2 == 1){
 	  sprintf(d, "Start of Day %d\n", cycle/2+1);
 	}else{
 	  sprintf(d, "Start of Night %d\n", cycle/2);
 	}
 	send_to_all(d, 0, &master, fdmax, socket_id, player_list, 1);
+	printf("Here6\n");
 	for(i = 0; i < MAX_PLAYERS; i++){
 	  player_list[i].vote=0;
 	  player_list[i].mark=MAX_PLAYERS;

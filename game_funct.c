@@ -168,6 +168,7 @@ int lynch_count(player* player_list ){
 
 int process_cmd(char *line, player p, player *player_list, int cycle){
   line  = trim(line);
+  //printf("here\n");
   if(count_tokens(line) == 1){
     if(strstr(line,"/p") == line){//print out player list
       return 1;
