@@ -1,0 +1,41 @@
+DW APPROVED
+
+Group Members
+
+      Tony Li (Period 4)
+      Ri Jiu Zheng (Period 4)
+      Raymond Wu (Period 5)
+
+Description
+	
+  Objective: 
+
+  A clone of the game Mafia.
+
+  User Interface: 
+
+  Players will initially be prompted to enter a temporary username to join the game. Once the 
+  host begins the game, other players who would like to join will have to wait until the game is 
+  over. Players are assigned their role randomly and will be directed to a window with a list of 
+  all the living players, dead players and their roles, and a chat. After a period of time, the 
+  players are then prompted to vote for someone by typing their username to lynch if they wish to. 
+  Each player’s decision will be displayed after the voting period is over. The accused will be 
+  moved to the dead list and his/her role will be revealed. The night session will take place and 
+  the players can perform their night action. The mafia can talk amongst one another and vote to 
+  kill one of the non-mafia people. The game ends when a victory condition is reached.
+
+Technical Design: 
+
+  -Players will be linked through networking. We will be implementing a Central Dispatch Server.
+  -Semaphores will be used to limit who can join the game.
+  -Structs to organize the player’s roles and status
+  -Process player input
+  -Signals to end the game, or to kill off players
+
+Other features we may implement:
+	
+  -Lobby system in which users may create games or join already existing games
+  -Color coded text for organization
+  -ore roles
+  -Narrator
+
