@@ -13,7 +13,7 @@
 void get_name(char *buffer, int socket_id){
   while(strlen(buffer) == 0){//if the client doesn't have a name, have the next input be the name.
     printf("Please enter your desired name: ");
-    fgets(buffer, sizeof(buffer), stdin);
+    fgets(buffer, 256, stdin);
     buffer[strlen(buffer) - 1] = '\0';
   }
 }
@@ -69,7 +69,7 @@ void setup_socket(int *socket_id){
 int main(int argc, char **argv) {
 
   int socket_id;
-  char name[256] = "\0";
+  char name[256] = "";
   fd_set master;
   fd_set read_fds;
 
