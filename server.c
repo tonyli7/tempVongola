@@ -114,6 +114,9 @@ int main() {
   int hold = day;//helps to check if day has changed
   int num_players = 0;
   time_t start,diff;
+  struct timeval timeout;
+  timeout.tv_sec = 0;
+  timeout.tv_usec = 0;
     
   char **ulist = (char**)calloc(15, sizeof(char *));
   for(i = 0; i < 15; i++){
@@ -127,21 +130,27 @@ int main() {
   while(1){
     //printf("Time:%d\n",time(NULL));
     read_fds = master;
-    if(num_players<1){
+    if(num_players<2){
       num_players=0;
       for(i = 0; i < 15; i++)
 	if(strlen(ulist[i])>0)
 	  num_players++;
     }
-    printf("Players:%d\n",num_players);
-    if (num_players>=1){//once num_players has reached a number, game begins
-      printf("HERE!\n");
+    //printf("Players:%d\n",num_players);
+    if (num_players>=2&&day==0){//once num_players has reached a number, game begins
+      //printf("HERE!\n");
       day = 1;
     }
     if(day>=1){
       if (hold!=day){
 	//printf("here2\n");
 	start = time(NULL);
+	char d[20];
+	if(day%2==1)
+	  sprintf(d,"Start of Day %d\n",day/2+1);
+	else
+	  sprintf(d,"Start of Night %d\n",day/2);
+	send_to_all(d,0,&master,fdmax,socket_id);
 	hold=day;
       }
       else{
@@ -154,23 +163,23 @@ int main() {
 	}
       }
     }
-    printf("here3\n");
-    if (select(fdmax+1, &read_fds, NULL, NULL, NULL) == -1){
+    //printf("here3\n");
+    if (select(fdmax+1, &read_fds, NULL, NULL, &timeout) == -1){
       printf("select: %s\n", strerror(errno));
       exit(0);
     }
-    fflush(stdout);
-    if(hold!=day){
-      printf("Here4\n");
+    //fflush(stdout);
+    /*if(hold!=day){
+      //printf("Here4\n");
       char d[20];
       if(day%2==1)
 	sprintf(d,"Start of Day %d\n",day/2+1);
       else
 	sprintf(d,"Start of Night %d\n",day/2);
       send_to_all(d,0,&master,fdmax,socket_id);
-    }
+    }*/
     for(i = 3; i <= fdmax; i++){
-      printf("Here2 %d,%d\n",hold,day);
+      //printf("Here2 %d,%d\n",hold,day);
       if(FD_ISSET(i, &read_fds)){
 	if(i == socket_id){//if a client is trying to connect
 	  //printf("Here3\n");
@@ -189,7 +198,6 @@ int main() {
 	    }*/
       }
     }
-    hold=day;
   }
 
   return 0;
