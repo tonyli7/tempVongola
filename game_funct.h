@@ -1,5 +1,5 @@
 #ifndef TOWNIE
-#define MAX_PLAYERS 3
+#define MAX_PLAYERS 2
 
 //--------ROLES----------
 #define TOWNIE 0
@@ -12,14 +12,8 @@
 #define ALIVE 1
 #define JUST_DEAD 2
 
-//-------MARK------------
-/*#define KILL 0
-#define HEAL 1
-#define NEUTRAL 2*/
-
 typedef struct player{
   char name[16];
-  int target;
   int role;
   int status;
   int vote;

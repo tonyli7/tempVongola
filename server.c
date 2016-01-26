@@ -13,39 +13,35 @@
 #include "game_funct.h"
 
 
-void send_to_all(char *line, int fd, fd_set *master, int fdmax, int socket_id, player *player_list, int cycle){
-  int i;
-
-  for (i = 3; i <= fdmax; i++){
-    if (FD_ISSET(i, master) && i != socket_id && i != fd){
-      printf("HERE\n");
-      if(cycle%2==0){
-	printf("HERE2\n");
-	if(player_list[fd-4].role!=MAFIOSO||player_list[i-4].role!=MAFIOSO){}
-	/*else if(process_cmd(line,player_list[fd-4],player_list,cycle)){
-	  sprintf(line,"%s has voted to kill %s\n",player_list[fd-4].name,player_list[player_list[fd-4].mark].name);
-	  if(send(i,line,strlen(line),0)==-1)
-	    printf("SEND: %s\n",strerror(errno));
-	    }*/
-	else{
-	  if(send(i,line,strlen(line),0)==-1)
-	    printf("SEND: %s\n",strerror(errno));
+void send_to_all(char *line, int fd, fd_set *master, int fdmax, player *player_list, int cycle){
+  if(fd != 0){
+    int command = process_cmd(line, player_list[fd-4], player_list, cycle);
+    if(command == -1){
+      int x;
+      for(x = 0; x < MAX_PLAYERS; x++){
+	if(player_list[x].status == ALIVE){
+	  sprintf(line, "%d %s\n", x, player_list[x].name);
 	}
       }
-      else{
-	printf("HERE3 %s\n",line);
-	/*if(cycle>1&&process_cmd(line,player_list[fd-4],player_list,cycle)){
-	  printf("HERE4\n");
-	  sprintf(line,"%s has voted to lynch %s\n",player_list[fd-4].name,player_list[player_list[fd-4].mark].name);
-	  }*/
-	printf("HERE5\n");
-	if(send(i, line, strlen(line), 0) == -1)
+    }else if(command < MAX_PLAYERS){
+      if(cycle%2 == 0){
+	sprintf(line, "%s has voted to kill %s\n", player_list[fd-4].name, player_list[player_list[fd-4].mark].name);
+      }else{
+	sprintf(line,"%s has voted to lynch %s\n", player_list[fd-4].name, player_list[player_list[fd-4].mark].name);
+      }
+    }
+  }
+  int i;
+  for (i = 4; i <= fdmax; i++){
+    if (FD_ISSET(i, master) && i != fd){
+      if((cycle%2 == 0 && player_list[fd-4].role == MAFIOSO && player_list[i-4].role == MAFIOSO) || cycle%2 == 1){
+	if(send(i, line, strlen(line), 0) == -1){
 	  printf("SEND: %s\n", strerror(errno));
 	}
       }
     }
-}
-
+  }
+} 
 
 void process(int fd, fd_set *master, int fdmax, int socket_id, player *player_list, int *num_players, int cycle){
   char buffer[256] = "";
@@ -71,7 +67,7 @@ void process(int fd, fd_set *master, int fdmax, int socket_id, player *player_li
     sprintf(line, "%s: %s", player_list[fd-4].name, buffer);
   }
   if(strlen(line) > 0){
-    send_to_all(line, fd, master, fdmax, socket_id, player_list, cycle);
+    send_to_all(line, fd, master, fdmax, player_list, cycle);
   }
 }
 
@@ -126,6 +122,7 @@ void accept_client(int socket_id, fd_set *master, int *fdmax, player *player_lis
 	*fdmax = client_socket;
       }
       player_list[client_socket - 4].status = ALIVE;
+      player_list[client_socket - 4].mark = -1;
     }
   }
 }
@@ -159,41 +156,36 @@ int main(){
 	  sprintf(buffer, "You are a %s.\n", get_role(player_list[i].role));
 	  if(send(i+4, buffer, strlen(buffer), 0) == -1){
 	    printf("SEND: %s\n", strerror(errno));
-	  } 
+	  }
 	}
       }
       print_alive(player_list);
-      printf("Here1\n");
     }
     if(cycle >= 1){
-      if (hold!=cycle){
+      if (hold != cycle){
 	start = time(NULL);
 	char d[20];
 	char deaths[256]="Deaths\n";
-	printf("Here4\n");
-	if(cycle>1){
-	  process_votes(player_list,cycle);
-	for(i = 0; i < MAX_PLAYERS; i++){
-	  if(player_list[i].status==JUST_DEAD){
-	    char *p = (char *)malloc(sizeof(char));
-	    printf("Here5\n");
-	    if(cycle%2==1)
-	      sprintf(p,"%s died by lynch\n",player_list[i].name);
-	    else
-	      sprintf(p,"%s died by Mafia\n",player_list[i].name);
-	    strcat(deaths,p);
-	    player_list[i].status=DEAD;
+	if(cycle > 1){
+	  process_votes(player_list, cycle);
+	  for(i = 0; i < MAX_PLAYERS; i++){
+	    if(player_list[i].status == JUST_DEAD){
+	      char *p = (char *)malloc(sizeof(char));
+	      if(cycle%2 == 1)
+		sprintf(p,"%s died by lynch\n",player_list[i].name);
+	      else
+		sprintf(p,"%s died by Mafia\n",player_list[i].name);
+	      strcat(deaths, p);
+	      player_list[i].status=DEAD;
+	    }
 	  }
 	}
-	}
-	printf("Here5\n");
 	if(cycle %2 == 1){
 	  sprintf(d, "Start of Day %d\n", cycle/2+1);
 	}else{
 	  sprintf(d, "Start of Night %d\n", cycle/2);
 	}
-	send_to_all(d, 0, &master, fdmax, socket_id, player_list, 1);
-	printf("Here6\n");
+	send_to_all(d, 0, &master, fdmax, player_list, 1);
 	for(i = 0; i < MAX_PLAYERS; i++){
 	  player_list[i].vote=0;
 	  player_list[i].mark=MAX_PLAYERS;
@@ -215,12 +207,10 @@ int main(){
 	if(i == socket_id){//if a client is trying to connect
 	  accept_client(socket_id, &master, &fdmax, player_list);
 	}else{
-	  printf("Here2\n");
 	  process(i, &master, fdmax, socket_id, player_list, &num_players, cycle);
 	}
       }
     }
   }
-
   return 0;
 }

@@ -1,3 +1,4 @@
+
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
@@ -26,28 +27,16 @@ void assign_roles(player* player_list){
     player_list[i].role=roles[i];
   }
 }
-/*
-int player_index(char* name, player* player_list){//find index of player
-  int i; 
-  for(i = 0; i < MAX_PLAYERS; i++){   
-    if (!strcmp(player_list[i].name,name)){
-      if (player_list[i].status == ALIVE){
-	return i;
-      }
-    }
-  } 
-  return -1;
-}
+
 int doctor_action(player* player_list){
   int i;
   for(i = 0; i < MAX_PLAYERS; i++){
     if (player_list[i].status == ALIVE){//if alive
       if (player_list[i].role == DOCTOR){//if doctor
-	int target = player_list[i].target;
+	int target = player_list[i].mark;
 	if (player_list[target].status == DEAD){//if target is dead
 	  return -1;
 	}
-	player_list[target].mark = HEAL;
       }
     }
   }
@@ -58,11 +47,10 @@ int mafia_action(player* player_list){
   for(i = 0; i < MAX_PLAYERS; i++){
     if (player_list[i].status == ALIVE){//if alive
       if (player_list[i].role == MAFIOSO){//if mafioso
-	int target = player_list[i].target;
+	int target = player_list[i].mark;
 	if (player_list[target].status == DEAD){//if target is dead
 	  return -1;
 	}
-	player_list[target].mark = KILL;
       }
     }
   }
@@ -73,7 +61,7 @@ int cop_action(player* player_list){
   for(i = 0; i < MAX_PLAYERS; i++){
     if (player_list[i].status == ALIVE){
       if (player_list[i].role == COP){
-	int target = player_list[i].target;
+	int target = player_list[i].mark;
 	if (player_list[target].status == DEAD){//if target is dead
 	  return -1;
 	}
@@ -81,31 +69,30 @@ int cop_action(player* player_list){
       }
     }
   }
-  }
+}
 
 int night_action(player* player_list){
-  int i;
-  
+  int i;  
   if(mafia_action(player_list) < 0){//do mafia stuff    
     return -1;
   } 
   if(doctor_action(player_list) < 0){//do doctor stuff
     return -1;
   }
-
   int revealed = cop_action(player_list);//do cop stuff
   if (revealed < 0){
     return -1;
   }
   printf("%s\n", get_role(revealed));
-
+  /*
   for(i = 0; i < MAX_PLAYERS; i++){
     if (player_list[i].mark == KILL){
       player_list[i].status=DEAD;
     }
   }
+  */
 }
-*/
+
 char* get_role(int role){
   if (role == TOWNIE){
     return "Townie";
@@ -116,7 +103,7 @@ char* get_role(int role){
   }else if (role == COP){
     return "Cop";
   }
-  }
+}
 
 void print_dead(player* player_list){
   int i;
@@ -137,7 +124,6 @@ void print_alive(player* player_list){
       printf("Name: %s ", player_list[i].name);      
       printf("Role: %s\n", get_role(player_list[i].role));
     }
-    printf("Here\n");
   }
 }
 
@@ -151,51 +137,34 @@ int num_alive(player* player_list){
   }
   return alive;
 }
-/*
-int lynch_count(player* player_list ){
-  int i;
-  int decision=0;
-  for(i = 0; i < MAX_PLAYERS; i++){
-    if (player_list[i].vote == YES){
-      decision++;
-    }
-  }
-  if (decision >= num_alive(player_list)/2+1){
-    return 0;
-  } 
-  return -1;
-  }*/
 
 int process_cmd(char *line, player p, player *player_list, int cycle){
-  //line  = trim(line);
-  //printf("here\n");
-  if(count_tokens(line) == 1){
-    if(strstr(line,"/p") == line){//print out player list
-      return 1;
-    }
-    return 0;
-  }
-  else if(count_tokens(line) == 2){
-    char **ps = (char**)parse_by_space(line);
-    if(strstr(ps[0],"/v") == line){
-      player target=player_list[atoi(ps[1])];
-	if(cycle%2 == 0){//if night
-	  if(target.role == MAFIOSO && p.role == MAFIOSO){
-	    return 0;
-	  }
-	}
-	if(p.mark<MAX_PLAYERS){
+  printf("%s\n", line);
+  char *command = malloc(256);
+  strcpy(command, line);
+  printf("%s\n", command);
+  char *saveptr;
+  strtok_r(command, " ", &saveptr);
+  command = strtok_r(NULL, " ", &saveptr);
+  char * next = strtok_r(NULL, " ", &saveptr);
+  printf("%s\n", command);
+  printf("%s\n", next);
+  if(!strcmp("/p", line)){
+    return -1;
+  }else if(!strcmp("/v", line)){
+    char *endptr = (next+1);
+    int target = strtol(next, &endptr, 10);
+    if(target >= 0 || target <= MAX_PLAYERS){
+      if((cycle%2  == 0 && player_list[target].role == MAFIOSO && p.role == MAFIOSO) || cycle%2 == 1){
+	if(p.mark != -1){
 	  player_list[p.mark].vote -= 1;
 	}
-	target.vote += 1;
-	p.mark=atoi(ps[1]);
-	return 1;
+	player_list[target].vote += 1;
+	return target;
+      }
     }
-    return 0;
   }
-  else{
-    return 0;
-  }
+  return MAX_PLAYERS;
 }
 
 void process_votes(player* player_list,int cycle){
@@ -203,13 +172,11 @@ void process_votes(player* player_list,int cycle){
   int min = num_alive(player_list)/2+1;
   if(cycle%2==1){
     for(i = 0; i < MAX_PLAYERS; i++)
-      if(player_list[i].vote>=min)
-	player_list[i].status=JUST_DEAD;
-  }
-  else{
+      if(player_list[i].vote >= min)
+	player_list[i].status = JUST_DEAD;
+  }else{
     for(i = 0; i < MAX_PLAYERS; i++)
-      if(player_list[i].vote>0)
-	player_list[i].status=JUST_DEAD;
+      if(player_list[i].vote > 0)
+	player_list[i].status = JUST_DEAD;
   }
-     
 }

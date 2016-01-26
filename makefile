@@ -1,7 +1,7 @@
 all: server client
 
-server: server.c game_funct.c game_funct.h commands.c commands.h
-	gcc -o server server.c game_funct.c commands.c
+server: server.c game_funct.c game_funct.h
+	gcc -o server server.c game_funct.c
 
 client: client.c
 	gcc -o client client.c
