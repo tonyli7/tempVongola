@@ -133,6 +133,15 @@ int main(){
     if (num_players == MAX_PLAYERS && cycle == 0){//once num_players has reached a number, game begins
       cycle = 1;
       assign_roles(player_list);
+      for(i = 0; i < MAX_PLAYERS; i++){
+	if(FD_ISSET(i+4, &master)){
+	  char buffer[64];
+	  sprintf(buffer, "You are a %s.\n", get_role(player_list[i].role));
+	  if(send(i+4, buffer, strlen(buffer), 0) == -1){
+	    printf("SEND: %s\n", strerror(errno));
+	  } 
+	}
+      }
       print_alive(player_list);
     }
     if(cycle >= 1){
