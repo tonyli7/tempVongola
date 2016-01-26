@@ -252,15 +252,15 @@ int main(){
       }
       else{
 	if(cycle == 1){
-	  if(time(NULL) - start >= 10)
+	  if(time(NULL) - start >= 30)
 	    cycle++;
 	}
         else if(cycle%2==1){
-	  if(time(NULL) - start >= 45)
+	  if(time(NULL) - start >= 60)
 	    cycle++;
 	}
 	else{
-	  if(time(NULL) - start >= 30)
+	  if(time(NULL) - start >= 45)
 	    cycle++;
 	}
 	    
