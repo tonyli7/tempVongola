@@ -82,10 +82,12 @@ void process(int fd, fd_set *master, int fdmax, int socket_id, player *player_li
       printf("recv: %s\n", strerror(errno));
     }else if(num_bytes == 0){
       sprintf(line, "%s has died.\n", player_list[fd-4].name);
+      send_to_all(line, 0, master, fdmax, player_list, 0);
+      line[0]='\0';
     }
     close(fd);
     FD_CLR(fd, master);
-    player_list[socket_id - 4].status = DEAD;
+    player_list[fd - 4].status = DEAD;
   }else if(strlen(player_list[fd-4].name) == 0){
     strncpy(player_list[fd-4].name, buffer, 15);
     (*num_players)++;
