@@ -14,7 +14,7 @@
 
 void send_to_all(char *line, int fd, fd_set *master, int fdmax, player *player_list, int cycle){
   //printf("HERE9\n");
-  if(fd != 0){
+  if(fd != 0 && cycle > 0){
     int command = process_cmd(line, player_list[fd-4], player_list, cycle);
     if(command == -1){
       int x;
@@ -22,9 +22,15 @@ void send_to_all(char *line, int fd, fd_set *master, int fdmax, player *player_l
       for(x = 0; x < MAX_PLAYERS; x++){
 	sprintf(line+strlen(line), "id: %d Name: %s Status: ", x, player_list[x].name);
 	if(player_list[x].status==ALIVE)
-	  sprintf(line+strlen(line), "ALIVE Votes: %d\n",player_list[x].vote);
+	  sprintf(line+strlen(line), "ALIVE Votes: %d",player_list[x].vote);
 	else
 	  sprintf(line+strlen(line), "DEAD Role: %s\n",get_role(player_list[x].role));
+	if(player_list[x].role==MAFIOSO&&player_list[fd-4].role==MAFIOSO&&player_list[x].status==ALIVE){
+	  strcat(line," Role: MAFIOSO\n");
+	}
+	else
+	  strcat(line,"\n");
+	    
       }
       send(fd, line, strlen(line), 0);
       return;
@@ -38,7 +44,7 @@ void send_to_all(char *line, int fd, fd_set *master, int fdmax, player *player_l
 	sprintf(line,"%s has voted to lynch %s\n", player_list[fd-4].name, player_list[command].name);
       }
       if(player_list[fd-4].mark != -1)
-	player_list[fd-4].vote-=1;
+	player_list[player_list[fd-4].mark].vote-=1;
       player_list[fd-4].mark=command;
       player_list[command].vote +=1;
       
@@ -199,8 +205,8 @@ int main(){
     if(cycle >= 1){     
       if (hold != cycle){
 	start = time(NULL);
-	char d[20]="";
-	char deaths[256]="";
+	char d[1024]="";
+	char deaths[1024]="";
 	if(cycle > 1){
 	  process_votes(player_list, cycle-1);
 	  for(i = 0; i < MAX_PLAYERS; i++){
