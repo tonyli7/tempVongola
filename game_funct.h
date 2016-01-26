@@ -1,3 +1,5 @@
+#ifndef GAME_FUNCT_H
+#define GAME_FUNCT_H
 //--------ROLES----------
 #define TOWNIE 0
 #define MAFIASO 1
@@ -41,3 +43,5 @@ int player_index(char* name, player* player_list);
 void print_DEAD(player* player_list);
 void print_ALIVE(player* player_list);
 char* get_role(int role);
+
+#endif
