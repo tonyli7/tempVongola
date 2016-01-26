@@ -9,5 +9,6 @@ client: client.c
 clean:
 	rm -f *~
 	rm -f *#
+	rm -f .#*
 	rm -f server
 	rm -f client

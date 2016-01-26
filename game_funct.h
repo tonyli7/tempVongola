@@ -1,5 +1,6 @@
-#ifndef GAME_FUNCT_H
-#define GAME_FUNCT_H
+#ifndef TOWNIE
+#define MAX_PLAYERS 2
+
 //--------ROLES----------
 #define TOWNIE 0
 #define MAFIASO 1
@@ -21,10 +22,9 @@
 #define NEUTRAL 2
 
 typedef struct player{
-  char name[256];
-  char target[256];
+  char name[16];
+  char target[16];
   int role;
-  int fd;
   int status;
   int vote;
   int mark;
