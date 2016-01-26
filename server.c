@@ -22,14 +22,22 @@ void send_to_all(char *line, int fd, fd_set *master, int fdmax, int socket_id, p
       if(cycle%2==0){
 	printf("HERE2\n");
 	if(player_list[fd-4].role!=MAFIOSO||player_list[i-4].role!=MAFIOSO){}
-	else if(process_cmd(line,player_list[fd-4],player_list,cycle))
+	/*else if(process_cmd(line,player_list[fd-4],player_list,cycle)){
 	  sprintf(line,"%s has voted to kill %s\n",player_list[fd-4].name,player_list[player_list[fd-4].mark].name);
+	  if(send(i,line,strlen(line),0)==-1)
+	    printf("SEND: %s\n",strerror(errno));
+	    }*/
+	else{
+	  if(send(i,line,strlen(line),0)==-1)
+	    printf("SEND: %s\n",strerror(errno));
+	}
       }
       else{
 	printf("HERE3 %s\n",line);
-	if(cycle>1&&process_cmd(line,player_list[fd-4],player_list,cycle)){
+	/*if(cycle>1&&process_cmd(line,player_list[fd-4],player_list,cycle)){
 	  printf("HERE4\n");
-	  sprintf(line,"%s has voted to lynch %s\n",player_list[fd-4].name,player_list[player_list[fd-4].mark].name);}
+	  sprintf(line,"%s has voted to lynch %s\n",player_list[fd-4].name,player_list[player_list[fd-4].mark].name);
+	  }*/
 	printf("HERE5\n");
 	if(send(i, line, strlen(line), 0) == -1)
 	  printf("SEND: %s\n", strerror(errno));
