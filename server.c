@@ -15,16 +15,15 @@
 
 void send_to_all(char *line, int fd, fd_set *master, int fdmax, int socket_id, player *player_list, int cycle){
   int i;
-  for (i = 3; i <= fdmax; i++){
-    if (FD_ISSET(i, master) && i != socket_id && i != fd){
-      if(cycle%2==0&&player_list[fd-4].role!=MAFIASO){}
-      else if(cycle%2==0&&player_list[i-4].role!=MAFIASO){}
-      else{
+  for(i = 3; i <= fdmax; i++){
+    if(FD_ISSET(i, master) && i != socket_id && i != fd){
+      if(cycle%2 == 0 && player_list[fd-4].role != MAFIOSO){
+      }else{
 	if(send(i, line, strlen(line), 0) == -1){
 	  printf("SEND: %s\n", strerror(errno));
+	}
       }
     }
-  }
   }
 }
 
@@ -34,7 +33,7 @@ void process(int fd, fd_set *master, int fdmax, int socket_id, player *player_li
   int num_bytes;
   num_bytes = recv(fd, buffer, sizeof(buffer), 0);
   buffer[num_bytes] = '\0';
-
+  
   if(num_bytes <= 0){
     if(num_bytes == -1){
       printf("recv: %s\n", strerror(errno));
@@ -46,8 +45,6 @@ void process(int fd, fd_set *master, int fdmax, int socket_id, player *player_li
     player_list[socket_id - 4].status = DEAD;
   }else if(strlen(player_list[fd-4].name) == 0){
     strncpy(player_list[fd-4].name, buffer, 15);
-    player_list[fd-4].name[15] = '\0';
-    printf("%s\n", player_list[fd-4].name);
     (*num_players)++;
     sprintf(line, "%s has entered the town.\n", player_list[fd-4].name);
   }else{
@@ -118,7 +115,7 @@ int main(){
   timeout.tv_sec = 0;
   timeout.tv_usec = 0;
 
-  player* player_list = calloc(MAX_PLAYERS, 86);
+  player* player_list = calloc(MAX_PLAYERS, sizeof(player));
   setup_socket(&socket_id);
   FD_ZERO(&master);
   FD_ZERO(&read_fds);
@@ -130,7 +127,7 @@ int main(){
     if (num_players == MAX_PLAYERS && cycle == 0){//once num_players has reached a number, game begins
       cycle = 1;
       assign_roles(player_list);
-      print_ALIVE(player_list);
+      print_alive(player_list);
     }
     if(cycle >= 1){
       if (hold!=cycle){
