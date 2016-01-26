@@ -24,7 +24,7 @@ void send_to_all(char *line, int fd, fd_set *master, int fdmax, player *player_l
 	if(player_list[x].status==ALIVE)
 	  sprintf(line+strlen(line), "ALIVE Votes: %d\n",player_list[x].vote);
 	else
-	  sprintf(line+strlen(line), "DEAD\n");
+	  sprintf(line+strlen(line), "DEAD Role: %s\n",get_role(player_list[x].role));
       }
       send(fd, line, strlen(line), 0);
       return;
@@ -131,7 +131,7 @@ void setup_socket(int *socket_id){
   }
 }
 
-void accept_client(int socket_id, fd_set *master, int *fdmax, player *player_list){
+void accept_client(int socket_id, fd_set *master, int *fdmax, player *player_list,int cycle){
   struct sockaddr_in client_addr;
   socklen_t addrlen = sizeof(client_addr);
   int client_socket = accept(socket_id, (struct sockaddr*)&client_addr, &addrlen);
@@ -139,7 +139,7 @@ void accept_client(int socket_id, fd_set *master, int *fdmax, player *player_lis
     printf("accept: %s\n", strerror(errno));
   }else{
     FD_SET(client_socket, master);
-    if(client_socket > 3 + MAX_PLAYERS){
+    if(client_socket > 3 + MAX_PLAYERS||cycle){
       char buffer[64] = "Sorry, too many players. Please wait.\n";
       if(send(client_socket, buffer, strlen(buffer), 0) == -1){
 	printf("SEND: %s\n",strerror(errno));
@@ -263,7 +263,7 @@ int main(){
     for(i = 3; i <= fdmax; i++){
       if(FD_ISSET(i, &read_fds)){
 	if(i == socket_id){//if a client is trying to connect
-	  accept_client(socket_id, &master, &fdmax, player_list);
+	  accept_client(socket_id, &master, &fdmax, player_list, cycle);
 	}else{
 	  process(i, &master, fdmax, socket_id, player_list, &num_players, cycle);
 	}
