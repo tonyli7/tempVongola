@@ -7,7 +7,7 @@ void shuffle(int *roles){
   int i;
   for(i = 0;i < MAX_PLAYERS; i++){
     int lucky = rand()%(MAX_PLAYERS-i) + i;
-    temp = roles[i];
+    int temp = roles[i];
     roles[i] = roles[lucky];
     roles[lucky] == temp;
   }
@@ -26,7 +26,7 @@ void assign_roles(player* player_list){
     player_list[i].role=roles[i];
   }
 }
-
+/*
 int player_index(char* name, player* player_list){//find index of player
   int i; 
   for(i = 0; i < MAX_PLAYERS; i++){   
@@ -82,7 +82,7 @@ int cop_action(player* player_list){
       }
     }
   }
-}
+  }
 
 int night_action(player* player_list){
   int i;
@@ -106,7 +106,7 @@ int night_action(player* player_list){
     }
   }
 }
-
+*/
 char* get_role(int role){
   if (role == TOWNIE){
     return "Townie";
@@ -117,7 +117,7 @@ char* get_role(int role){
   }else if (role == COP){
     return "Cop";
   }
-}
+  }
 
 void print_DEAD(player* player_list){
   int i;
@@ -153,7 +153,7 @@ int num_alive(player* player_list){
   }
   return alive;
 }
-
+/*
 int lynch_count(player* player_list ){
   int i;
   int decision=0;
@@ -166,7 +166,7 @@ int lynch_count(player* player_list ){
     return 0;
   } 
   return -1;
-}
+  }*/
 
 int process_cmd(char* line,player p, player* player_list, int cycle){
   line  = trim(line);
@@ -185,14 +185,32 @@ int process_cmd(char* line,player p, player* player_list, int cycle){
 	    return 0;
 	  }
 	}
-	if(p.mark){
+	if(p.mark<MAX_PLAYERS){
 	  player_list[p.mark].vote -= 1;
 	}
 	target.vote += 1;
+	p.mark=atoi(ps[1]);
+	return 1;
     }
     return 0;
   }
   else{
     return 0;
   }
+}
+
+void process_votes(player* player_list,int cycle){
+  int i;
+  int min = num_alive(player_list)/2+1;
+  if(cycle%2==1){
+    for(i = 0; i < MAX_PLAYERS; i++)
+      if(player_list[i].vote>=min)
+	player_list[i].status=JUST_DEAD;
+  }
+  else{
+    for(i = 0; i < MAX_PLAYERS; i++)
+      if(player_list[i].vote>0)
+	player_list[i].status=JUST_DEAD;
+  }
+     
 }

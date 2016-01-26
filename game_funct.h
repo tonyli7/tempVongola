@@ -10,16 +10,12 @@
 //-------STATUS----------
 #define DEAD 0
 #define ALIVE 1
-
-//-------VOTE------------
-#define NO -1
-#define ABSTAIN 0
-#define YES 1
+#define JUST_DEAD 2
 
 //-------MARK------------
-#define KILL 0
+/*#define KILL 0
 #define HEAL 1
-#define NEUTRAL 2
+#define NEUTRAL 2*/
 
 typedef struct player{
   char name[16];
@@ -34,7 +30,7 @@ typedef struct player{
 void assign_roles(player* player_list);
 int lynch_count(player* player_list);
 int num_alive(player* player_list);
-void shuffle(player* player_list);
+void shuffle(int* list);
 int night_action(player* player_list);
 int doctor_action(player* player_list);
 int mafia_action(player* player_list);
